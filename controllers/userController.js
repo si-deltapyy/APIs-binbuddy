@@ -3,7 +3,7 @@ const db = require("../config/db");
 // Ambil semua user
 exports.getAllUsers = async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM users");
+    const [rows] = await db.query("SELECT id, name, email FROM users");
     res.json(rows);
   } catch (error) {
     res.status(500).json({ message: error.message });
