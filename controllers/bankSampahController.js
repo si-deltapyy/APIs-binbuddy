@@ -22,12 +22,12 @@ exports.getBankSampahById = async (req, res) => {
     }
 }
 
-// exports.createBankSampah = async (req, res) => {
-//     const { nama, alamat, telepon } = req.body;
-//     try {
-//         const [rows] = await db.query('INSERT INTO banksampah (nama, alamat, telepon) VALUES (?, ?, ?)', [nama, alamat, telepon]);
-//         res.json({ id: rows.insertId, nama, alamat, telepon });
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-// }
+exports.createBankSampah = async (req, res) => {
+    const { name, pengelola_name, address } = req.body;
+    try {
+        const [rows] = await db.query('INSERT INTO banksampah (name, pengelola_name, address) VALUES (?, ?, ?)', [name, pengelola_name, address]);
+        res.json({ id: rows.insertId, nama, alamat, telepon });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
