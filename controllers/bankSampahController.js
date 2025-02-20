@@ -23,9 +23,9 @@ exports.getBankSampahById = async (req, res) => {
 }
 
 exports.createBankSampah = async (req, res) => {
-    const { name, pengelola_name, address } = req.body;
+    const { name, pengelola_name, address, created_at } = req.body;
     try {
-        const [rows] = await db.query('INSERT INTO banksampah (name, pengelola_name, address) VALUES (?, ?, ?)', [name, pengelola_name, address]);
+        const [rows] = await db.query('INSERT INTO banksampah (name, pengelola_name, address, created_at) VALUES (?, ?, ?)', [name, pengelola_name, address, created_at]);
         res.json({ id: rows.insertId, nama, alamat, telepon });
     } catch (err) {
         res.status(500).json({ message: err.message });
