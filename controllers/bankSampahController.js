@@ -9,6 +9,19 @@ exports.getAllBankSampah = async (req, res) => {
     }
 }
 
+exports.getBankSampahById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows] = await db.query('SELECT * FROM banksampah WHERE id = ?', [id]);
+        if (rows.length === 0) {
+            return res.status(404).json({ message: 'Bank Sampah tidak ditemukan' });
+        }
+        res.json(rows[0]);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
 // exports.createBankSampah = async (req, res) => {
 //     const { nama, alamat, telepon } = req.body;
 //     try {
