@@ -1,19 +1,23 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
+let blacklistedTokens = new Set();
+// Middleware untuk mengecek token di blacklist
 const verifyToken = (req, res, next) => {
-    const token = req.header('Authorization');
-    if (!token) {
-        return res.status(401).json({ message: 'Access Denied, Please Contact Admin' });
+    const token = req.header("Authorization")?.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "Akses ditolak. Token tidak ditemukan." });
+
+    if (blacklistedTokens.has(token)) {
+        return res.status(401).json({ message: "Token sudah tidak valid, silakan login kembali." });
     }
 
-    try {
-        const decode =jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
-        req.user = decode;
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) return res.status(403).json({ message: "Token tidak valid." });
+        req.user = decoded;
         next();
-    } catch (err) {
-        res.status(403).json({ message: 'Invalid Token' });
-    }
+    });
 };
 
 module.exports = verifyToken;
+
+
