@@ -44,7 +44,16 @@ router.post("/login", async (req, res) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = await generateRefreshToken(user);
 
-        return res.json({ response: {accessToken, refreshToken} },{metadata: {message: "ok", status: 200}});
+        return res.json({
+            response: {
+              accessToken,
+              refreshToken
+            },
+            metadata: {
+              message: "ok",
+              status: 200
+            }
+          });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
