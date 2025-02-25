@@ -25,7 +25,7 @@ const generateRefreshToken = async (user) => {
 
 // Login
 router.post("/login", async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, id } = req.body;
     try {
         const [rows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
         if (rows.length === 0) {
@@ -44,7 +44,7 @@ router.post("/login", async (req, res) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = await generateRefreshToken(user);
 
-        return res.json({ accessToken, refreshToken });
+        return res.json({ response: {accessToken, refreshToken} },{metadata: {message: "ok", status: 200}});
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
