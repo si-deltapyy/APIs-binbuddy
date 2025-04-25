@@ -8,8 +8,12 @@ const bankSampahRoutes = require("./bankSampahRoutes");
 
 // Prefix untuk setiap route
 router.use("/users", userRoutes);
-router.use("/a", common);
+router.use("/protect", common);
 router.use("/auth", authRoutes);
 router.use("/banksampah", bankSampahRoutes);
+router.use("/transactions", require("./transactionRoutes"));
+router.use("/customers", require("./customerRoutes"));
+router.use("/balances", require("./balanceRoutes"));
+router.use("/waste", require("./wasteRoutes"));
 
 module.exports = router;

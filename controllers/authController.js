@@ -1,50 +1,101 @@
-const db = require('../config/db');
-const bcrypt = require('bcryptjs');
+const db = require('../models');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-exports.register = async (req, res) => {
-  const { email, password } = req.body;
+const AuthController = {
+  register: async (req, res) => {
+    const { name, email, password, banksampah_id, role } = req.body;
 
-  // Validasi
-  if (!email || !password) {
-    return res.status(400).json({ message: 'email dan password wajib diisi' });
-  }
+    try {
+      // Cek apakah Bank Sampah tersedia
+      const bank = await db.BankSampah.findByPk(banksampah_id);
+      if (!bank) {
+        return res.status(400).json({ message: 'Bank Sampah tidak ditemukan' });
+      }
 
-  // Cek user sudah ada
-  db.query('SELECT * FROM users WHERE name = ?', [email], async (err, results) => {
-    if (err) return res.status(500).json({ message: 'Query error' });
+      // Cek apakah email sudah digunakan
+      const existing = await db.User.findOne({ where: { email } });
+      if (existing) {
+        return res.status(400).json({ message: 'Email sudah terdaftar' });
+      }
 
-    if (results.length > 0) {
-      return res.status(400).json({ message: 'email sudah terdaftar' });
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Buat user baru
+      const user = await db.User.create({
+        name,
+        email,
+        password: hashedPassword,
+        role: role || 'user',
+        banksampah_id
+      });
+
+      res.status(201).json({
+        message: 'Registrasi berhasil',
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          banksampah_id: user.banksampah_id
+        }
+      });
+
+    } catch (err) {
+      res.status(500).json({ message: err.message });
     }
+  },
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+  login: async (req, res) => {
+    const { email, password } = req.body;
 
-    // Simpan user baru
-    db.query('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword], (err) => {
-      if (err) return res.status(500).json({ message: 'Gagal menyimpan user' });
+    try {
+      const user = await db.User.findOne({ where: { email } });
+      if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
 
-      return res.status(201).json({ message: 'Registrasi berhasil' });
+      const match = await bcrypt.compare(password, user.password);
+      if (!match) return res.status(401).json({ message: 'Password salah' });
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role, banksampah_id: user.banksampah_id },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      req.session.user = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      };
+
+      res.json({
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          banksampah_id: user.banksampah_id
+        },
+        users: req.session.user
+      });
+
+
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  },
+
+  logout: (req, res) => {
+    req.session.destroy(err => {
+      if (err) {
+        return res.status(500).json({ message: 'Gagal logout' });
+      }
+      res.clearCookie('connect.sid'); // Hapus cookie sesi
+      res.json({ message: 'Logout berhasil' });
     });
-  });
+  }
 };
 
-exports.login = (req, res) => {
-  const { email, password } = req.body;
-
-  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
-    if (err) return res.status(500).json({ message: 'Query error' });
-
-    if (results.length === 0) {
-      return res.status(401).json({ message: 'User tidak ditemukan' });
-    }
-
-    const user = results[0];
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Password salah' });
-    }
-
-    return res.status(200).json({ message: 'Login berhasil' });
-  });
-};
+module.exports = AuthController;

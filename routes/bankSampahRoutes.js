@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const banksampahController = require('../controllers/bankSampahController');
-const verifyToken = require('../middlewares/auth');
+const BankSampahController = require('../controllers/bankSampahController');
+const authM = require('../middleware/authMiddleware');
 
-router.get('/:id', banksampahController.getBankSampahById);
-router.get('/', verifyToken, banksampahController.getAllBankSampah);
-router.post('/post', verifyToken, banksampahController.createBankSampah);
+// GET all
+router.get('/', authM, BankSampahController.getAllBankSampah);
+router.get('/:id/data', BankSampahController.getBankSampahById);
+router.post('/', BankSampahController.createBankSampah);
+router.put('/:id', BankSampahController.updateBankSampah);
+router.delete('/:id', BankSampahController.deleteBankSampah);
 
 module.exports = router;

@@ -1,14 +1,33 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
 const bodyParser = require('body-parser');
 const routes = require('./routes');
-require('dotenv').config();
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
+app.use(session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+      maxAge: 2 * 60 * 60 * 1000, // 2 jam
+      httpOnly: true,
+      secure: false // Ganti ke true jika pakai HTTPS
+    }
+  }));
+  
+app.use((req, res, next) => {
+if (req.session.user) {
+    req.session.touch();
+}
+next();
+});
 
 app.use("/api", routes);
 

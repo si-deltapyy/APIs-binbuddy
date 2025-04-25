@@ -1,33 +1,53 @@
-const db = require('../config/db');
+const db = require('../models'); // pastikan path benar
 
-exports.getAllBankSampah = async (req, res) => {
-    try {
-        const [rows] = await db.query('SELECT * FROM banksampah');
-        res.json(rows);
-    } catch (err) {
+const BankSampahController = {
+    getAllBankSampah: async (req, res) => {
+      try {
+        const data = await db.BankSampah.findAll();
+        res.json(data);
+      } catch (err) {
         res.status(500).json({ message: err.message });
-    }
-}
-
-exports.getBankSampahById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const [rows] = await db.query('SELECT * FROM banksampah WHERE id = ?', [id]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: 'Bank Sampah tidak ditemukan' });
-        }
-        res.json(rows[0]);
-    } catch (err) {
+      }
+    },
+  
+    getBankSampahById: async (req, res) => {
+      try {
+        const data = await db.BankSampah.findByPk(req.params.id);
+        if (!data) return res.status(404).json({ message: 'Data Tidak Ditemukan' });
+        res.json(data);
+      } catch (err) {
         res.status(500).json({ message: err.message });
-    }
-}
-
-exports.createBankSampah = async (req, res) => {
-    const { name, pengelola_name, address } = req.body;
-    try {
-        const [rows] = await db.query('INSERT INTO banksampah (name, pengelola_name, address, created_at) VALUES (?, ?, ?, ?)', [name, pengelola_name, address, new Date()]);
-        res.json({ id: rows.insertId, nama, alamat, telepon });
-    } catch (err) {
+      }
+    },
+  
+    createBankSampah: async (req, res) => {
+      try {
+        const data = await db.BankSampah.create(req.body);
+        res.status(201).json(data);
+      } catch (err) {
+        res.status(400).json({ message: err.message });
+      }
+    },
+  
+    updateBankSampah: async (req, res) => {
+      try {
+        const data = await db.BankSampah.update(req.body, {
+          where: { id: req.params.id }
+        });
+        res.json({ message: 'Updated successfully' });
+      } catch (err) {
         res.status(500).json({ message: err.message });
+      }
+    },
+  
+    deleteBankSampah: async (req, res) => {
+      try {
+        await db.BankSampah.destroy({ where: { id: req.params.id } });
+        res.json({ message: 'Deleted successfully' });
+      } catch (err) {
+        res.status(500).json({ message: err.message });
+      }
     }
-}
+  };
+  
+  module.exports = BankSampahController;
