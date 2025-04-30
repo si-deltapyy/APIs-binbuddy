@@ -8,7 +8,11 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:8100', // ⬅️ Sesuaikan dengan port Ionic kamu
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 
 app.use(session({
@@ -21,7 +25,7 @@ app.use(session({
       secure: false // Ganti ke true jika pakai HTTPS
     }
   }));
-  
+
 app.use((req, res, next) => {
 if (req.session.user) {
     req.session.touch();

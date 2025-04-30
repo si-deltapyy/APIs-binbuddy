@@ -1,24 +1,31 @@
-const db = require("../config/db");
+const db = require('../models');
 
-// Ambil semua user
-exports.getAllUsers = async (req, res) => {
-  try {
-    const [rows] = await db.query("SELECT id, name, email FROM users");
-    res.json(rows);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+const UserController = {
+  getInfo: async (req, res) => {
+    try {
+      const userId = req.session.user.id; // Ambil dari JWT (middleware auth)
+
+      const [result] = await db.sequelize.query(
+        `SELECT u.name, u.role, u.email, b.amount, bp.points
+         FROM users u
+         LEFT JOIN balances b ON b.user_id = u.id
+         LEFT JOIN bpoin bp ON bp.user_id = u.id
+         WHERE u.id = ?`,
+        {
+          replacements: [userId],
+          type: db.Sequelize.QueryTypes.SELECT
+        }
+      );
+
+      if (!result) {
+        return res.status(404).json({ message: 'User tidak ditemukan' });
+      }
+
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
   }
 };
 
-// Tambah user
-exports.createUser = async (req, res) => {
-  try {
-    const { name, email } = req.body;
-    await db.query("INSERT INTO users (name, email) VALUES (?, ?)", [name, email]);
-    res.status(201).json({ message: "User added successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-
+module.exports = UserController;

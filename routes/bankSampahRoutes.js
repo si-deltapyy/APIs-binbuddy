@@ -5,6 +5,7 @@ const authM = require('../middleware/authMiddleware');
 
 // GET all
 router.get('/', authM, BankSampahController.getAllBankSampah);
+router.get('/banks', BankSampahController.getName);
 router.get('/:id/data', BankSampahController.getBankSampahById);
 router.post('/', BankSampahController.createBankSampah);
 router.put('/:id', BankSampahController.updateBankSampah);

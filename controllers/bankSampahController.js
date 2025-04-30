@@ -9,6 +9,19 @@ const BankSampahController = {
         res.status(500).json({ message: err.message });
       }
     },
+
+    // controllers/banksampahController.js
+    getName: async (req, res) => {
+        try {
+        const data = await db.BankSampah.findAll({
+            attributes: ['id', 'name']
+        });
+        res.json(data);
+        } catch (err) {
+        res.status(500).json({ message: err.message });
+        }
+    },
+    
   
     getBankSampahById: async (req, res) => {
       try {

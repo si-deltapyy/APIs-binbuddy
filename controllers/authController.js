@@ -51,7 +51,7 @@ const AuthController = {
 
     try {
       const user = await db.User.findOne({ where: { email } });
-      if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
+      if (!user) return res.status(404).json({ message: 'User Tidak Terdaftar' });
 
       const match = await bcrypt.compare(password, user.password);
       if (!match) return res.status(401).json({ message: 'Password salah' });
@@ -66,19 +66,17 @@ const AuthController = {
         id: user.id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        token: token,
       };
 
       res.json({
-        token,
         user: {
           id: user.id,
           name: user.name,
           email: user.email,
           role: user.role,
-          banksampah_id: user.banksampah_id
-        },
-        users: req.session.user
+        }
       });
 
 
