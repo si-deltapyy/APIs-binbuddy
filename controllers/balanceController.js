@@ -2,8 +2,9 @@ const db = require('../models');
 
 exports.getByCustomer = async (req, res) => {
   try {
+    const userId = req.session.user.id;
     const balance = await db.Balance.findOne({
-      where: { customer_id: req.params.id }
+      where: { user_id: userId }
     });
 
     if (!balance) return res.status(404).json({ message: 'Saldo tidak ditemukan' });

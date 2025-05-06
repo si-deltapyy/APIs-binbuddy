@@ -8,11 +8,6 @@ module.exports = (sequelize, DataTypes) => {
       underscored: true
     });
   
-    WasteItem.associate = (models) => {
-      WasteItem.belongsTo(models.WasteCategory, { foreignKey: 'category_id' });
-      WasteItem.hasMany(models.WastePrice, { foreignKey: 'waste_item_id' });
-    };
-  
     return WasteItem;
   };
   

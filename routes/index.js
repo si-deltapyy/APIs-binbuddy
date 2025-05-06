@@ -15,5 +15,6 @@ router.use("/transactions", require("./transactionRoutes"));
 router.use("/customers", require("./customerRoutes"));
 router.use("/balances", require("./balanceRoutes"));
 router.use("/waste", require("./wasteRoutes"));
+router.use("/wd", require("./withdrawlRoutes"));
 
 module.exports = router;

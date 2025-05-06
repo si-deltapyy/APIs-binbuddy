@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     Customer.associate = (models) => {
       Customer.belongsTo(models.BankSampah, { foreignKey: 'bank_sampah_id' });
       Customer.hasMany(models.Transaction, { foreignKey: 'customer_id' });
-      Customer.hasOne(models.Balance, { foreignKey: 'customer_id' });
+      Customer.hasMany(models.Withdraw, { foreignKey: 'customer_id' });
     };
   
     return Customer;

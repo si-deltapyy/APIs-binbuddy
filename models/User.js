@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
       underscored: true
     });
+
+    User.associate = (models) => {
+      User.hasOne(models.Balance, { foreignKey: 'user_id' });
+    };
       
     return User;
   };

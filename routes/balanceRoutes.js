@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/balanceController');
-const auth = require('../middleware/auth');
+const authM = require('../middleware/authMiddleware');
 
-router.get('/:id', auth, controller.getByCustomer); // /api/balances/:id
+router.get('/trx', authM, controller.getByCustomer); // /api/balances/:id
 
 module.exports = router;
